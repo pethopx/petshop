@@ -167,6 +167,53 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               ),
               const SizedBox(height: 24),
               if (_paymentMethod == 'cash') ...[
+                const SizedBox(height: 16),
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.blue.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: Colors.blue.shade200),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(Icons.info_outline, color: Colors.blue),
+                          SizedBox(width: 8),
+                          Text(
+                            'Kapıda Ödeme Bilgisi',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 8),
+                      Text(
+                        'Siparişiniz adresinize ulaştığında, kurye tarafından ödeme yapabilirsiniz.',
+                        style: TextStyle(fontSize: 14),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 16),
+                const Text(
+                  'Kapıda Ödeme Yöntemi',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                RadioListTile(
+                  title: const Text('Nakit Ödeme'),
+                  value: 'cash_payment',
+                  groupValue: 'cash_payment',
+                  onChanged: (value) {},
+                ),
+                const SizedBox(height: 16),
                 Consumer<CartProvider>(
                   builder: (ctx, cart, child) => Column(
                     children: [
@@ -203,6 +250,14 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                   ),
                 ),
               ] else ...[
+                const Text(
+                  'Kredi Kartı Bilgileri',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 16),
                 CreditCardWidget(
                   cardNumber: cardNumber,
                   expiryDate: expiryDate,
@@ -213,13 +268,34 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                   onCreditCardWidgetChange: (brand) {},
                   bankName: 'PattMall Bank',
                 ),
-                CreditCardForm(
-                  cardNumber: cardNumber,
-                  expiryDate: expiryDate,
-                  cardHolderName: cardHolderName,
-                  cvvCode: cvvCode,
-                  onCreditCardModelChange: _onCreditCardModelChange,
-                  formKey: GlobalKey<FormState>(),
+                const SizedBox(height: 16),
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.grey.shade300),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Kart Bilgilerinizi Güvenle Girin',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      CreditCardForm(
+                        cardNumber: cardNumber,
+                        expiryDate: expiryDate,
+                        cardHolderName: cardHolderName,
+                        cvvCode: cvvCode,
+                        onCreditCardModelChange: _onCreditCardModelChange,
+                        formKey: GlobalKey<FormState>(),
+                      ),
+                    ],
+                  ),
                 ),
                 const SizedBox(height: 16),
                 Row(
@@ -232,7 +308,11 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                         });
                       },
                     ),
-                    const Text('Kart bilgilerimi onaylıyorum'),
+                    Expanded(
+                      child: const Text(
+                        'Kart bilgilerimi onaylıyorum ve güvenli ödemeler kapsamında işlenmesine izin veriyorum',
+                      ),
+                    ),
                   ],
                 ),
                 Consumer<CartProvider>(

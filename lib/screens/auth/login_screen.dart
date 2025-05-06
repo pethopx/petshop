@@ -13,8 +13,6 @@ class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  bool _isLogin = true;
-  bool _isLoading = false;
 
   @override
   void dispose() {
@@ -23,39 +21,12 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  Future<void> _submit() async {
-    if (!_formKey.currentState!.validate()) {
-      return;
-    }
-    setState(() {
-      _isLoading = true;
-    });
-
-    try {
-      if (_isLogin) {
-        await Provider.of<AuthProvider>(context, listen: false).login(
-          _emailController.text,
-          _passwordController.text,
-        );
-      } else {
-        await Provider.of<AuthProvider>(context, listen: false).signup(
-          _emailController.text,
-          _passwordController.text,
-        );
-      }
-    } catch (error) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(error.toString()),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
-    } finally {
-      setState(() {
-        _isLoading = false;
-      });
+  void _submit() {
+    if (_formKey.currentState!.validate()) {
+      Provider.of<AuthProvider>(context, listen: false).login(
+        _emailController.text,
+        _passwordController.text,
+      );
     }
   }
 
@@ -63,71 +34,56 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('PattMall'),
+        title: const Text('Giriş Yap'),
       ),
-      body: Center(
-        child: Card(
-          margin: const EdgeInsets.all(20),
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(16),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  TextFormField(
-                    controller: _emailController,
-                    decoration: const InputDecoration(labelText: 'E-posta'),
-                    keyboardType: TextInputType.emailAddress,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Lütfen e-posta adresinizi girin';
-                      }
-                      if (!value.contains('@')) {
-                        return 'Geçerli bir e-posta adresi girin';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 16),
-                  TextFormField(
-                    controller: _passwordController,
-                    decoration: const InputDecoration(labelText: 'Şifre'),
-                    obscureText: true,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Lütfen şifrenizi girin';
-                      }
-                      if (value.length < 6) {
-                        return 'Şifre en az 6 karakter olmalıdır';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 24),
-                  if (_isLoading)
-                    const CircularProgressIndicator()
-                  else
-                    ElevatedButton(
-                      onPressed: _submit,
-                      child: Text(_isLogin ? 'Giriş Yap' : 'Kayıt Ol'),
-                    ),
-                  TextButton(
-                    onPressed: () {
-                      setState(() {
-                        _isLogin = !_isLogin;
-                      });
-                    },
-                    child: Text(_isLogin
-                        ? 'Hesabınız yok mu? Kayıt olun'
-                        : 'Zaten hesabınız var mı? Giriş yapın'),
-                  ),
-                ],
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              TextFormField(
+                controller: _emailController,
+                decoration: const InputDecoration(
+                  labelText: 'E-posta',
+                  border: OutlineInputBorder(),
+                ),
+                keyboardType: TextInputType.emailAddress,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Lütfen e-posta adresinizi girin';
+                  }
+                  return null;
+                },
               ),
-            ),
+              const SizedBox(height: 16),
+              TextFormField(
+                controller: _passwordController,
+                decoration: const InputDecoration(
+                  labelText: 'Şifre',
+                  border: OutlineInputBorder(),
+                ),
+                obscureText: true,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Lütfen şifrenizi girin';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 24),
+              ElevatedButton(
+                onPressed: _submit,
+                style: ElevatedButton.styleFrom(
+                  minimumSize: const Size(double.infinity, 50),
+                ),
+                child: const Text('Giriş Yap'),
+              ),
+            ],
           ),
         ),
       ),
     );
   }
-} 
+}

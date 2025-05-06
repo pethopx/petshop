@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:patili_dukkan/providers/cart_provider.dart';
 import 'package:patili_dukkan/models/product.dart';
+import 'package:patili_dukkan/widgets/product_card.dart';
+import 'package:patili_dukkan/screens/cart/cart_screen.dart';
 
 class RabbitProductsScreen extends StatelessWidget {
   const RabbitProductsScreen({super.key});
@@ -11,58 +13,58 @@ class RabbitProductsScreen extends StatelessWidget {
     final List<Product> rabbitProducts = [
       Product(
         id: '1',
-        title: 'Tavşan Yemi (1kg)',
-        price: 55.0,
-        imageUrl: 'https://picsum.photos/600',
+        title: 'Tavşan Yemi (Az)',
+        price: 50.0,
+        imageUrl: 'resimler/tavsan_yem_az.png',
         category: 'rabbit_food',
       ),
       Product(
         id: '2',
-        title: 'Tavşan Yemi (2kg)',
-        price: 95.0,
-        imageUrl: 'https://picsum.photos/601',
+        title: 'Tavşan Yemi (Çok)',
+        price: 90.0,
+        imageUrl: 'resimler/tavsan_yem-cok.png',
         category: 'rabbit_food',
       ),
       Product(
         id: '3',
-        title: 'Tavşan Kafesi (Orta)',
-        price: 350.0,
-        imageUrl: 'https://picsum.photos/602',
-        category: 'rabbit_cage',
+        title: 'Tavşan Talaşı (Az)',
+        price: 40.0,
+        imageUrl: 'resimler/tavsan_talas_az.png',
+        category: 'rabbit_bedding',
       ),
       Product(
         id: '4',
-        title: 'Tavşan Kafesi (Büyük)',
-        price: 450.0,
-        imageUrl: 'https://picsum.photos/603',
-        category: 'rabbit_cage',
+        title: 'Tavşan Talaşı (Çok)',
+        price: 75.0,
+        imageUrl: 'resimler/tavsan_talas_cok.png',
+        category: 'rabbit_bedding',
       ),
       Product(
         id: '5',
-        title: 'Tavşan Talaşı (2kg)',
-        price: 40.0,
-        imageUrl: 'https://picsum.photos/604',
-        category: 'rabbit_bedding',
+        title: 'Tavşan Kafesi (Küçük)',
+        price: 200.0,
+        imageUrl: 'resimler/tavsan_kafes_kucuk.png',
+        category: 'rabbit_cage',
       ),
       Product(
         id: '6',
-        title: 'Tavşan Talaşı (5kg)',
-        price: 85.0,
-        imageUrl: 'https://picsum.photos/605',
-        category: 'rabbit_bedding',
+        title: 'Tavşan Kafesi (Büyük)',
+        price: 350.0,
+        imageUrl: 'resimler/tavsan_kafes_buyuk.png',
+        category: 'rabbit_cage',
       ),
       Product(
         id: '7',
-        title: 'Tavşan Suluk (Orta)',
-        price: 45.0,
-        imageUrl: 'https://picsum.photos/606',
+        title: 'Tavşan Suluğu',
+        price: 30.0,
+        imageUrl: 'resimler/tavsan_suluk.png',
         category: 'rabbit_accessories',
       ),
       Product(
         id: '8',
-        title: 'Tavşan Suluk (Büyük)',
-        price: 65.0,
-        imageUrl: 'https://picsum.photos/607',
+        title: 'Tavşan Büyük Suluğu',
+        price: 45.0,
+        imageUrl: 'resimler/tavsan_buyuk_suluk.png',
         category: 'rabbit_accessories',
       ),
     ];
@@ -70,87 +72,60 @@ class RabbitProductsScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Tavşan Ürünleri'),
+        actions: [
+          Stack(
+            alignment: Alignment.center,
+            children: [
+              IconButton(
+                icon: const Icon(Icons.shopping_cart),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const CartScreen()),
+                  );
+                },
+              ),
+              Positioned(
+                right: 8,
+                top: 8,
+                child: Consumer<CartProvider>(
+                  builder: (ctx, cart, _) => cart.itemCount > 0
+                      ? Container(
+                          padding: const EdgeInsets.all(2),
+                          decoration: BoxDecoration(
+                            color: Colors.red,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          constraints: const BoxConstraints(
+                            minWidth: 16,
+                            minHeight: 16,
+                          ),
+                          child: Text(
+                            '${cart.itemCount}',
+                            style: const TextStyle(
+                              fontSize: 10,
+                              color: Colors.white,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        )
+                      : const SizedBox(),
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
       body: GridView.builder(
         padding: const EdgeInsets.all(16),
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 2,
-          childAspectRatio: 1.2,
+          childAspectRatio: 0.65,
           crossAxisSpacing: 16,
           mainAxisSpacing: 16,
         ),
         itemCount: rabbitProducts.length,
-        itemBuilder: (ctx, index) => _ProductCard(product: rabbitProducts[index]),
-      ),
-    );
-  }
-}
-
-class _ProductCard extends StatelessWidget {
-  final Product product;
-
-  const _ProductCard({required this.product});
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      elevation: 4,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-            child: SizedBox(
-              height: 120,
-              child: Image.network(
-                product.imageUrl,
-                fit: BoxFit.cover,
-                width: double.infinity,
-              ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  product.title,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  '${product.price.toStringAsFixed(2)} TL',
-                  style: const TextStyle(
-                    fontSize: 14,
-                    color: Colors.green,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    IconButton(
-                      icon: const Icon(Icons.add_shopping_cart),
-                      onPressed: () {
-                        Provider.of<CartProvider>(context, listen: false)
-                            .addItem(product);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Ürün sepete eklendi'),
-                            duration: Duration(seconds: 2),
-                          ),
-                        );
-                      },
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ],
+        itemBuilder: (ctx, index) => ProductCard(product: rabbitProducts[index]),
       ),
     );
   }

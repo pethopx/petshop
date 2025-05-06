@@ -1,182 +1,138 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:patili_dukkan/providers/auth_provider.dart';
-import 'package:patili_dukkan/screens/cart/cart_screen.dart';
+import 'package:patili_dukkan/providers/cart_provider.dart';
+import 'package:patili_dukkan/screens/products/bird_products_screen.dart';
 import 'package:patili_dukkan/screens/products/cat_products_screen.dart';
 import 'package:patili_dukkan/screens/products/dog_products_screen.dart';
 import 'package:patili_dukkan/screens/products/fish_products_screen.dart';
-import 'package:patili_dukkan/screens/products/bird_products_screen.dart';
 import 'package:patili_dukkan/screens/products/hamster_products_screen.dart';
 import 'package:patili_dukkan/screens/products/rabbit_products_screen.dart';
+import 'package:patili_dukkan/screens/cart/cart_screen.dart';
 
-class HomeScreen extends StatefulWidget {
+class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
-}
-
-class _HomeScreenState extends State<HomeScreen> {
-  final TextEditingController _searchController = TextEditingController();
-  String _searchQuery = '';
-
-  @override
-  void dispose() {
-    _searchController.dispose();
-    super.dispose();
-  }
-
-  void _onSearchChanged(String query) {
-    setState(() {
-      _searchQuery = query.toLowerCase();
-    });
-  }
-
-  bool _shouldShowCategory(String categoryName, List<String> searchTerms) {
-    if (_searchQuery.isEmpty) return true;
-    
-    final categoryLower = categoryName.toLowerCase();
-    return searchTerms.any((term) => categoryLower.contains(term));
-  }
-
-  @override
   Widget build(BuildContext context) {
-    final searchTerms = _searchQuery.split(' ').where((term) => term.isNotEmpty).toList();
-
     return Scaffold(
-      appBar: AppBar( 
-        title: const Text('Evcil Market'),
+      appBar: AppBar(
+        title: const Text('PattMall'),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.shopping_cart),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const CartScreen()),
-              );
-            },
+          Stack(
+            alignment: Alignment.center,
+            children: [
+              IconButton(
+                icon: const Icon(Icons.shopping_cart),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const CartScreen()),
+                  );
+                },
+              ),
+              Positioned(
+                right: 8,
+                top: 8,
+                child: Consumer<CartProvider>(
+                  builder: (ctx, cart, _) => cart.itemCount > 0
+                      ? Container(
+                          padding: const EdgeInsets.all(2),
+                          decoration: BoxDecoration(
+                            color: Colors.red,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          constraints: const BoxConstraints(
+                            minWidth: 16,
+                            minHeight: 16,
+                          ),
+                          child: Text(
+                            '${cart.itemCount}',
+                            style: const TextStyle(
+                              fontSize: 10,
+                              color: Colors.white,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        )
+                      : const SizedBox(),
+                ),
+              ),
+            ],
           ),
           IconButton(
-            icon: const Icon(Icons.logout),
+            icon: const Icon(Icons.exit_to_app),
             onPressed: () {
               Provider.of<AuthProvider>(context, listen: false).logout();
             },
           ),
         ],
       ),
-      body: Column(
+      body: GridView.count(
+        padding: const EdgeInsets.all(16),
+        crossAxisCount: 2,
+        mainAxisSpacing: 16,
+        crossAxisSpacing: 16,
         children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: TextField(
-              controller: _searchController,
-              onChanged: _onSearchChanged,
-              decoration: InputDecoration(
-                hintText: 'Ürün veya kategori ara...',
-                prefixIcon: const Icon(Icons.search),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                suffixIcon: _searchQuery.isNotEmpty
-                    ? IconButton(
-                        icon: const Icon(Icons.clear),
-                        onPressed: () {
-                          _searchController.clear();
-                          _onSearchChanged('');
-                        },
-                      )
-                    : null,
-              ),
-            ),
+          _CategoryCard(
+            title: 'Kedi Ürünleri',
+            icon: Icons.pets,
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const CatProductsScreen()),
+              );
+            },
           ),
-          Expanded(
-            child: GridView.count(
-              crossAxisCount: 2,
-              padding: const EdgeInsets.all(8),
-              mainAxisSpacing: 8,
-              crossAxisSpacing: 8,
-              childAspectRatio: 1.5,
-              children: [
-                if (_shouldShowCategory('Kedi Ürünleri', searchTerms))
-                  _CategoryCard(
-                    title: 'Kedi Ürünleri',
-                    icon: Icons.pets,
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const CatProductsScreen(),
-                        ),
-                      );
-                    },
-                  ),
-                if (_shouldShowCategory('Köpek Ürünleri', searchTerms))
-                  _CategoryCard(
-                    title: 'Köpek Ürünleri',
-                    icon: Icons.pets,
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const DogProductsScreen(),
-                        ),
-                      );
-                    },
-                  ),
-                if (_shouldShowCategory('Balık Ürünleri', searchTerms))
-                  _CategoryCard(
-                    title: 'Balık Ürünleri',
-                    icon: Icons.pets,
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const FishProductsScreen(),
-                        ),
-                      );
-                    },
-                  ),
-                if (_shouldShowCategory('Kuş Ürünleri', searchTerms))
-                  _CategoryCard(
-                    title: 'Kuş Ürünleri',
-                    icon: Icons.pets,
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const BirdProductsScreen(),
-                        ),
-                      );
-                    },
-                  ),
-                if (_shouldShowCategory('Hamster Ürünleri', searchTerms))
-                  _CategoryCard(
-                    title: 'Hamster Ürünleri',
-                    icon: Icons.pets,
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const HamsterProductsScreen(),
-                        ),
-                      );
-                    },
-                  ),
-                if (_shouldShowCategory('Tavşan Ürünleri', searchTerms))
-                  _CategoryCard(
-                    title: 'Tavşan Ürünleri',
-                    icon: Icons.pets,
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const RabbitProductsScreen(),
-                        ),
-                      );
-                    },
-                  ),
-              ],
-            ),
+          _CategoryCard(
+            title: 'Köpek Ürünleri',
+            icon: Icons.pets,
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const DogProductsScreen()),
+              );
+            },
+          ),
+          _CategoryCard(
+            title: 'Balık Ürünleri',
+            icon: Icons.water,
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const FishProductsScreen()),
+              );
+            },
+          ),
+          _CategoryCard(
+            title: 'Kuş Ürünleri',
+            icon: Icons.flutter_dash,
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const BirdProductsScreen()),
+              );
+            },
+          ),
+          _CategoryCard(
+            title: 'Tavşan Ürünleri',
+            icon: Icons.cruelty_free,
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const RabbitProductsScreen()),
+              );
+            },
+          ),
+          _CategoryCard(
+            title: 'Hamster Ürünleri',
+            icon: Icons.pets,
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const HamsterProductsScreen()),
+              );
+            },
           ),
         ],
       ),
@@ -198,7 +154,7 @@ class _CategoryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      elevation: 2,
+      elevation: 4,
       child: InkWell(
         onTap: onTap,
         child: Column(
@@ -206,14 +162,15 @@ class _CategoryCard extends StatelessWidget {
           children: [
             Icon(
               icon,
-              size: 32,
+              size: 48,
               color: Theme.of(context).primaryColor,
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: 8),
             Text(
               title,
+              textAlign: TextAlign.center,
               style: const TextStyle(
-                fontSize: 14,
+                fontSize: 16,
                 fontWeight: FontWeight.bold,
               ),
             ),
